@@ -3,7 +3,7 @@ import { styles } from "@/styles/auth.styles";
 import { useSSO } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function login() {
   const { startSSOFlow } = useSSO();
@@ -27,17 +27,23 @@ export default function login() {
       {/* BRAND SECTION */}
       <View style={styles.brandSection}>
         <View style={styles.logoContainer}>
-          <Ionicons name="leaf" size={32} color={COLORS.primary} />
+          <Image
+            source={require("../../assets/images/social-media.png")}
+            style={{ ...styles.illustration, width: 60, height: 60 }}
+            resizeMode="cover"
+          />
+          {/* <Ionicons name="chatbubble-ellipses" size={32} color={COLORS.primary} /> */}
         </View>
-        <Text style={styles.appName}>spotlight</Text>
-        <Text style={styles.tagline}>don't miss anything</Text>
+        <Text style={styles.appName}>BENCH</Text>
+        <Text style={styles.tagline}>Catch NEW people</Text>
       </View>
 
       {/* ILLUSTRATION */}
       <View style={styles.illustrationContainer}>
         <Image
-          source={require("../../assets/images/auth-bg-2.png")}
+          source={require("../../assets/images/logo3.png")}
           style={styles.illustration}
+          
           resizeMode="cover"
         />
       </View>

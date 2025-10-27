@@ -16,6 +16,8 @@ import {
 } from "react-native";
 
 import { Image } from "expo-image";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -93,13 +95,19 @@ export default function CreateScreen() {
     );
   }
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+return (
+  <KeyboardAwareScrollView
+     contentContainerStyle={{ flexGrow: 1 }}
+  enableOnAndroid
+  extraScrollHeight={40} // push input above keyboard
+  style={styles.container}
+  >
+    <ScrollView
+      contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]} // ✅ allow scroll expansion
+      keyboardShouldPersistTaps="always"
+      showsVerticalScrollIndicator={false}
     >
-      <View style={styles.contentContainer}>
+      <View style={[{ flex: 1 }, styles.contentContainer]}>
         {/* HEADER */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -115,7 +123,9 @@ export default function CreateScreen() {
               color={isSharing ? COLORS.grey : COLORS.white}
             />
           </TouchableOpacity>
+
           <Text style={styles.headerTitle}>New Post</Text>
+
           <TouchableOpacity
             style={[styles.shareButton, isSharing && styles.shareButtonDisabled]}
             disabled={isSharing || !selectedImage}
@@ -129,54 +139,48 @@ export default function CreateScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          bounces={false}
-          keyboardShouldPersistTaps="handled"
-          contentOffset={{ x: 0, y: 100 }}
-        >
-          <View style={[styles.content, isSharing && styles.contentDisabled]}>
-            {/* IMAGE SECTION */}
-            <View style={styles.imageSection}>
-              <Image
-                source={selectedImage}
-                style={styles.previewImage}
-                contentFit="cover"
-                transition={200}
-              />
-              <TouchableOpacity
-                style={styles.changeImageButton}
-                onPress={pickImage}
-                disabled={isSharing}
-              >
-                <Ionicons name="image-outline" size={20} color={COLORS.white} />
-                <Text style={styles.changeImageText}>Change</Text>
-              </TouchableOpacity>
-            </View>
+        {/* IMAGE SECTION */}
+        <View style={styles.imageSection}>
+          <Image
+            source={selectedImage}
+            style={styles.previewImage}
+            contentFit="cover"
+            transition={200}
+          />
+          <TouchableOpacity
+            style={styles.changeImageButton}
+            onPress={pickImage}
+            disabled={isSharing}
+          >
+            <Ionicons name="image-outline" size={20} color={COLORS.white} />
+            <Text style={styles.changeImageText}>Change</Text>
+          </TouchableOpacity>
+        </View>
 
-            {/* INPUT SECTION */}
-            <View style={styles.inputSection}>
-              <View style={styles.captionContainer}>
-                <Image
-                  source={user?.imageUrl}
-                  style={styles.userAvatar}
-                  contentFit="cover"
-                  transition={200}
-                />
-                <TextInput
-                  style={styles.captionInput}
-                  placeholder="Write a caption..."
-                  placeholderTextColor={COLORS.grey}
-                  multiline
-                  value={caption}
-                  onChangeText={setCaption}
-                  editable={!isSharing}
-                />
-              </View>
-            </View>
+        {/* INPUT SECTION */}
+        <View style={styles.inputSection}>
+          <View style={styles.captionContainer}>
+            <Image
+              source={user?.imageUrl}
+              style={styles.userAvatar}
+              contentFit="cover"
+              transition={200}
+            />
+
+            <TextInput
+              style={styles.captionInput}
+              placeholder="Write a caption..."
+              placeholderTextColor={COLORS.grey}
+              multiline
+              value={caption}
+              onChangeText={setCaption}
+              editable={!isSharing}
+              returnKeyType="done"
+            />
           </View>
-        </ScrollView>
+        </View>
       </View>
-    </KeyboardAvoidingView>
-  );
+    </ScrollView>
+  </KeyboardAwareScrollView>
+);
 }
