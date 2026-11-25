@@ -18,6 +18,18 @@ export default function UserProfileScreen() {
   const isFollowing = useQuery(api.users.isFollowing, { followingId: id as Id<"users"> });
 
   const toggleFollow = useMutation(api.users.toggleFollow);
+  const getOrCreateConversation = useMutation(api.messages.getOrCreateConversation);
+
+  const handleMessage = async () => {
+    try {
+      const conversationId = await getOrCreateConversation({
+        otherUserId: id as Id<"users">,
+      });
+      router.push(`/messages/${conversationId}`);
+    } catch (error) {
+      console.error("Failed to open chat:", error);
+    }
+  };
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
@@ -67,14 +79,23 @@ export default function UserProfileScreen() {
           <Text style={styles.name}>{profile.fullname}</Text>
           {profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
 
-          <Pressable
-            style={[styles.followButton, isFollowing && styles.followingButton]}
-            onPress={() => toggleFollow({ followingId: id as Id<"users"> })}
-          >
-            <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
-              {isFollowing ? "Following" : "Follow"}
-            </Text>
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <Pressable
+              style={[styles.followButton, { flex: 1 }, isFollowing && styles.followingButton]}
+              onPress={() => toggleFollow({ followingId: id as Id<"users"> })}
+            >
+              <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+                {isFollowing ? "Following" : "Follow"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.followButton, styles.followingButton, { flex: 1 }]}
+              onPress={handleMessage}
+            >
+              <Text style={styles.followingButtonText}>Message</Text>
+            </Pressable>
+          </View>
         </View>
 
         <View style={styles.postsGrid}>

@@ -1,8 +1,12 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/theme";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
 
 export default function TabLayout() {
+  const unreadNotifications = useQuery(api.notifications.getUnreadCount) ?? 0;
+
   return (
     <Tabs
       screenOptions={{
@@ -43,6 +47,12 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
+          tabBarBadge: unreadNotifications > 0 ? unreadNotifications : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: COLORS.primary,
+            color: COLORS.white,
+            fontSize: 10,
+          },
           tabBarIcon: ({ color, size }) => <Ionicons name="heart" size={size} color={color} />,
         }}
       />

@@ -6,6 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
+import { useRouter } from "expo-router";
 import {
   FlatList,
   RefreshControl,
@@ -16,16 +17,16 @@ import {
 } from "react-native";
 import { styles } from "../../styles/feed.styles";
 import { useState } from "react";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Index() {
   const { signOut } = useAuth();
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
   const posts = useQuery(api.posts.getFeedPosts);
+  const unreadMessagesCount = useQuery(api.messages.getUnreadCount) ?? 0;
 
   if (posts === undefined) return <Loader />;
-  if (posts.length === 0) return <NoPostsFound />;
 
   // this does nothing
   const onRefresh = () => {
@@ -45,30 +46,64 @@ export default function Index() {
           resizeMode="cover"
         />
 
-        {/* <Ionicons name="chatbubble-ellipses" size={28} color="#407BFF" /> */}
-        {/* <Ionicons name="bed-outline" size={24} color="blue" /> */}
-
         <Text style={styles.headerTitle}>BENCH</Text>
-        <TouchableOpacity onPress={() => signOut()}>
-          <Ionicons name="log-out-outline" size={24} color={COLORS.white} />
-        </TouchableOpacity>
+
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+          <TouchableOpacity onPress={() => signOut()}>
+            <Ionicons name="log-out-outline" size={22} color={COLORS.grey} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/messages")}
+            style={{ position: "relative", padding: 2 }}
+          >
+            <Ionicons name="paper-plane-outline" size={24} color={COLORS.white} />
+            {unreadMessagesCount > 0 && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -6,
+                  minWidth: 18,
+                  height: 18,
+                  borderRadius: 9,
+                  backgroundColor: COLORS.primary,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingHorizontal: 4,
+                }}
+              >
+                <Text style={{ color: COLORS.white, fontSize: 10, fontWeight: "700" }}>
+                  {unreadMessagesCount > 99 ? "99+" : unreadMessagesCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <FlatList
-        data={posts}
-        renderItem={({ item }) => <Post post={item} />}
-        keyExtractor={(item) => item._id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 60 }}
-        ListHeaderComponent={<StoriesSection />}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={COLORS.primary}
-          />
-        }
-      />
+      {posts.length === 0 ? (
+        <View style={{ flex: 1 }}>
+          <StoriesSection />
+          <NoPostsFound />
+        </View>
+      ) : (
+        <FlatList
+          data={posts}
+          renderItem={({ item }) => <Post post={item} />}
+          keyExtractor={(item) => item._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 60 }}
+          ListHeaderComponent={<StoriesSection />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={COLORS.primary}
+            />
+          }
+        />
+      )}
     </View>
   );
 }

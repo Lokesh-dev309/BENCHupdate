@@ -1,3 +1,4 @@
+import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
@@ -86,6 +87,26 @@ export const getUserProfile = query({
   },
 });
 
+export const getUsers = query({
+  handler: async (ctx) => {
+    const currentUser = await getAuthenticatedUser(ctx);
+    const users = await ctx.db.query("users").collect();
+
+    const orderedUsers = [
+      currentUser,
+      ...users.filter((user) => user._id !== currentUser._id),
+    ];
+
+    return orderedUsers.map((user) => ({
+      _id: user._id,
+      username: user.username,
+      fullname: user.fullname,
+      image: user.image,
+      isCurrentUser: user._id === currentUser._id,
+    }));
+  },
+});
+
 export const isFollowing = query({
   args: { followingId: v.id("users") },
   handler: async (ctx, args) => {
@@ -131,6 +152,17 @@ export const toggleFollow = mutation({
         receiverId: args.followingId,
         senderId: currentUser._id,
         type: "follow",
+        isRead: false,
+      });
+
+      await ctx.scheduler.runAfter(0, internal.push.sendPushNotification, {
+        receiverId: args.followingId,
+        title: "New Follower",
+        body: `${currentUser.username} started following you`,
+        data: {
+          type: "follow",
+          senderId: currentUser._id,
+        },
       });
     }
   },

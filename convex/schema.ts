@@ -50,6 +50,7 @@ export default defineSchema({
     type: v.union(v.literal("like"), v.literal("comment"), v.literal("follow")),
     postId: v.optional(v.id("posts")),
     commentId: v.optional(v.id("comments")),
+    isRead: v.optional(v.boolean()),
   })
     .index("by_receiver", ["receiverId"])
     .index("by_post", ["postId"]),
@@ -61,4 +62,52 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_post", ["postId"])
     .index("by_user_and_post", ["userId", "postId"]),
+
+  conversations: defineTable({
+    participantOneId: v.id("users"),
+    participantTwoId: v.id("users"),
+    lastMessageText: v.optional(v.string()),
+    lastMessageSenderId: v.optional(v.id("users")),
+    lastMessageAt: v.number(),
+  })
+    .index("by_participant_one", ["participantOneId"])
+    .index("by_participant_two", ["participantTwoId"])
+    .index("by_participants", ["participantOneId", "participantTwoId"]),
+
+  messages: defineTable({
+    conversationId: v.id("conversations"),
+    senderId: v.id("users"),
+    receiverId: v.id("users"),
+    content: v.string(),
+    isRead: v.boolean(),
+  })
+    .index("by_conversation", ["conversationId"])
+    .index("by_receiver_unread", ["receiverId", "isRead"]),
+
+  pushTokens: defineTable({
+    userId: v.id("users"),
+    token: v.string(),
+    platform: v.string(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_token", ["token"]),
+
+  stories: defineTable({
+    userId: v.id("users"),
+    imageUrl: v.string(),
+    storageId: v.id("_storage"),
+    caption: v.optional(v.string()),
+    expiresAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_expires", ["expiresAt"]),
+
+  storyViews: defineTable({
+    storyId: v.id("stories"),
+    viewerId: v.id("users"),
+    viewedAt: v.number(),
+  })
+    .index("by_story", ["storyId"])
+    .index("by_story_and_viewer", ["storyId", "viewerId"]),
 });

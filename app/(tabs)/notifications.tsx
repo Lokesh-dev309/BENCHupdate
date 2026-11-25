@@ -4,11 +4,24 @@ import { COLORS } from "@/constants/theme";
 import { api } from "@/convex/_generated/api";
 import { styles } from "@/styles/notifications.styles";
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { FlatList, Text, View } from "react-native";
 
 export default function Notifications() {
   const notifications = useQuery(api.notifications.getNotifications);
+  const markAllAsRead = useMutation(api.notifications.markAllAsRead);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (notifications && notifications.some((n) => n.isRead === false)) {
+        markAllAsRead().catch((err) =>
+          console.error("Failed to mark notifications read:", err)
+        );
+      }
+    }, [notifications, markAllAsRead])
+  );
 
   if (notifications === undefined) return <Loader />;
   if (notifications.length === 0) return <NoNotificationsFound />;

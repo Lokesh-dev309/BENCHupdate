@@ -1,8 +1,7 @@
-import { getNotifications } from "./notifications";
 import { v } from "convex/values";
-import { mutation, MutationCtx, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { getAuthenticatedUser } from "./users";
-import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -120,6 +119,18 @@ export const toggleLike = mutation({
           senderId: currentUser._id,
           type: "like",
           postId: args.postId,
+          isRead: false,
+        });
+
+        await ctx.scheduler.runAfter(0, internal.push.sendPushNotification, {
+          receiverId: post.userId,
+          title: "New Like",
+          body: `${currentUser.username} liked your post`,
+          data: {
+            type: "like",
+            senderId: currentUser._id,
+            postId: args.postId,
+          },
         });
       }
       return true; // liked

@@ -1,9 +1,11 @@
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@clerk/clerk-expo";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 
 export default function InitialLayout() {
   const { isLoaded, isSignedIn } = useAuth();
+  usePushNotifications();
 
   const segments = useSegments();
   const router = useRouter();
