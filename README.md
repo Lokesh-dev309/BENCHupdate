@@ -44,6 +44,27 @@ Most social apps feel like a pile of separate features. **BENCH brings them toge
 > ⚡ No refresh buttons. No polling. Powered by Convex, **every like, comment and message appears the moment it happens.**
 
 ---
+📥 Download
+
+Try BENCH on your Android phone right now. No setup needed.
+
+<div align="center"> <a href="https://github.com/Lokesh-dev309/bench11/releases/latest/download/bench.apk"> <img src="https://img.shields.io/badge/⬇%20Download%20BENCH.apk-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download BENCH APK"/> </a>
+
+<sub>Latest version on the <a href="https://github.com/Lokesh-dev309/bench11/releases/latest">Releases page</a></sub>
+
+</div>
+
+How to install
+
+Download bench.apk on your Android phone.
+Open the file. If prompted, allow Install from unknown sources for your browser or file manager.
+Tap Install, then open BENCH and sign in. 🎉
+
+
+
+
+
+
 
 ## 📸 Screenshots
 
